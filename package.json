@@ -1,0 +1,26 @@
+{
+  "name": "gsfp-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "GSFP M&E Dashboard — Zonal Coordinators school monitoring, with drill-down indicators",
+  "scripts": {
+    "dev": "node node_modules/vite/bin/vite.js",
+    "build": "node node_modules/typescript/bin/tsc -b && node node_modules/vite/bin/vite.js build",
+    "preview": "node node_modules/vite/bin/vite.js preview",
+    "_comment": "Scripts call node directly because the '&' in the folder path breaks npm's .cmd shims (vite/tsc). Standard 'vite'/'tsc' shims fail with a truncated path."
+  },
+  "dependencies": {
+    "@fontsource/public-sans": "^5.2.7",
+    "@fontsource/source-serif-4": "^5.2.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.5"
+  }
+}
