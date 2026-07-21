@@ -154,6 +154,31 @@ export function summarise(rows: PaymentRow[]): PaymentTotals {
   )
 }
 
+export type GroupDim = 'region' | 'district' | 'none'
+
+export interface PaymentGroup {
+  key: string
+  label: string
+  rows: PaymentRow[]
+  totals: PaymentTotals
+}
+
+/** Split the schedule into groups, each carrying a TRUE subtotal for all its rows. */
+export function groupRows(rows: PaymentRow[], dim: Exclude<GroupDim, 'none'>): PaymentGroup[] {
+  const map = new Map<string, PaymentRow[]>()
+  for (const r of rows) {
+    const label = dim === 'region' ? shortRegionLabel(r.region) : r.district
+    const list = map.get(label)
+    if (list) list.push(r)
+    else map.set(label, [r])
+  }
+  return [...map.entries()]
+    .map(([label, list]) => ({ key: label, label, rows: list, totals: summarise(list) }))
+    .sort((a, b) => b.totals.amount - a.totals.amount)
+}
+
+const shortRegionLabel = (r: string) => r.replace(/ REGION$/, '')
+
 /** Roll up for disbursement batches. */
 export function groupTotals(rows: PaymentRow[], dim: 'region' | 'district'): GroupTotal[] {
   const map = new Map<string, GroupTotal>()

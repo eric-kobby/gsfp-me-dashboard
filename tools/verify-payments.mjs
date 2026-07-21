@@ -11,10 +11,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const RATE = Number(process.argv[2] ?? 1.2)
 
 const entry = `
-  import { buildPaymentRows, summarise, groupTotals, toCSV, TERM_ORDER } from './src/lib/payments'
+  import { buildPaymentRows, summarise, groupTotals, groupRows, toCSV, TERM_ORDER } from './src/lib/payments'
   import subs from './src/data/submissions.json'
   import cats from './src/data/caterers.json'
-  export { buildPaymentRows, summarise, groupTotals, toCSV, TERM_ORDER, subs, cats }
+  export { buildPaymentRows, summarise, groupTotals, groupRows, toCSV, TERM_ORDER, subs, cats }
 `
 
 const built = await esbuild.build({
@@ -84,7 +84,20 @@ for (const term of mod.TERM_ORDER) {
   })
   check('source visit is at/after the paid term', badSource.length === 0, `${badSource.length} bad`)
 
-  // 7. CSV: one line per row + header + blank + total
+  // 7. grouped schedule: every row lands in exactly one group, subtotals cross-foot
+  for (const dim of ['region', 'district']) {
+    const gs = mod.groupRows(rows, dim)
+    const rowsInGroups = gs.reduce((a, g) => a + g.rows.length, 0)
+    const amtInGroups = gs.reduce((a, g) => a + g.totals.amount, 0)
+    const pupilsInGroups = gs.reduce((a, g) => a + g.totals.pupils, 0)
+    check(`group-by-${dim}: every row in exactly one group`, rowsInGroups === rows.length, `${rowsInGroups} vs ${rows.length}`)
+    check(`group-by-${dim}: subtotals cross-foot to total`, near(amtInGroups, t.amount), `${amtInGroups.toFixed(2)} vs ${t.amount.toFixed(2)}`)
+    check(`group-by-${dim}: pupil subtotals cross-foot`, pupilsInGroups === t.pupils, `${pupilsInGroups} vs ${t.pupils}`)
+    const emptyGroups = gs.filter((g) => g.rows.length === 0)
+    check(`group-by-${dim}: no empty groups`, emptyGroups.length === 0)
+  }
+
+  // 8. CSV: one line per row + header + blank + total
   const csv = mod.toCSV(rows, opts)
   const lines = csv.split('\r\n')
   check('CSV line count', lines.length === rows.length + 3, `${lines.length} vs ${rows.length + 3}`)

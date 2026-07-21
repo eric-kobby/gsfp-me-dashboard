@@ -145,7 +145,7 @@ export function App() {
               <VisitsTable slice={slice} />
             </>
           ) : (
-            <PaymentsView sliceGeo={sliceGeo} filters={filters} />
+            <PaymentsView sliceGeo={sliceGeo} filters={filters} onFilterChange={setFilters} />
           )}
 
           <div className="colophon">

@@ -1194,6 +1194,57 @@ table,
   font-weight: 700;
   background: var(--panel);
 }
+/* clickable summary row */
+.trow.click {
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  background: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.trow.click:hover {
+  background: var(--panel);
+}
+/* group header inside the schedule */
+.trow.grp {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule-2);
+  background: var(--panel);
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.trow.grp:hover {
+  background: var(--brand-softer, var(--panel));
+  filter: brightness(0.985);
+}
+.grp-caret {
+  display: inline-block;
+  width: 14px;
+  color: var(--ink-2);
+}
+.grp-sub {
+  font-weight: 400;
+  color: var(--ink-2);
+  font-size: 11.5px;
+}
+.grp-more {
+  padding: 7px 0 7px 14px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule-2);
+}
 .sub-cell {
   color: var(--ink-2);
   font-weight: 400;
