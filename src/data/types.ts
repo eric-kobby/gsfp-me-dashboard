@@ -6,6 +6,7 @@ export interface Submission {
   Region: string
   district: string
   school_name: string
+  emis_code: string
   lat: string
   lon: string
   No_boys: string
@@ -57,17 +58,26 @@ export interface Submission {
 
 export interface Caterer {
   _id: string
+  /** Term of the monitoring visit this record came from. */
   term: string
+  /** Date of that visit — the "verified as at" date for payment. */
+  record_date: string
   Region: string
   district: string
   school_name: string
   caterer_name: string
+  phone: string
   enrollment: string
   health_screened: string
   cert_obtained: string
   cert_inspected: string
   total_cooks: string
   cooks_with_valid_cert: string
+  /** NCDs — number of cooking days — reported per term (Q15.5–15.7).
+      A visit also reports earlier terms, so a late visit carries full prior terms. */
+  ncd_1st_term: string
+  ncd_2nd_term: string
+  ncd_3rd_term: string
 }
 
 /** A filtered view of the dataset that every metric operates on. */

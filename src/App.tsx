@@ -6,6 +6,7 @@ import { FilterBar } from './components/Filters'
 import { KpiGrid } from './components/KpiGrid'
 import { DrillDrawer } from './components/DrillDrawer'
 import { Section, SECTIONS } from './components/Section'
+import { PaymentsView } from './components/PaymentsView'
 import { CoverageSection } from './components/sections/CoverageSection'
 import { TrendSection } from './components/sections/TrendSection'
 import { CompositionSection } from './components/sections/CompositionSection'
@@ -17,12 +18,21 @@ import { DataQualitySection } from './components/sections/DataQualitySection'
 import { VisitsTable } from './components/sections/VisitsTable'
 
 type Theme = 'light' | 'dark'
+type View = 'monitoring' | 'payments'
+
+const PAY_SECTIONS = [
+  { id: 'pay-basis', num: 'P1', name: 'Basis of payment' },
+  { id: 'pay-summary', num: 'P2', name: 'Disbursement' },
+  { id: 'pay-schedule', num: 'P3', name: 'Schedule' },
+]
 
 export function App() {
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('gsfp-theme') as Theme) || 'light')
   const [filters, setFilters] = useState<Filters>({ region: '', district: '', term: '' })
   const [drill, setDrill] = useState<Indicator | null>(null)
+  const [view, setView] = useState<View>('monitoring')
   const [activeSec, setActiveSec] = useState<string>(SECTIONS[0].id)
+  const railItems = view === 'monitoring' ? SECTIONS : PAY_SECTIONS
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -40,12 +50,12 @@ export function App() {
       },
       { rootMargin: '-70px 0px -60% 0px', threshold: 0 },
     )
-    SECTIONS.forEach((s) => {
+    railItems.forEach((s) => {
       const el = document.getElementById(s.id)
       if (el) obs.observe(el)
     })
     return () => obs.disconnect()
-  }, [])
+  }, [railItems])
 
   const slice: Slice = useMemo(() => {
     const { region, district, term } = filters
@@ -76,6 +86,23 @@ export function App() {
             <span className="mark">Ghana School Feeding Programme</span>
             <span className="sub">Zonal M&amp;E Ledger</span>
           </div>
+          <div className="viewswitch" role="tablist" aria-label="View">
+            {(['monitoring', 'payments'] as View[]).map((v) => (
+              <button
+                key={v}
+                role="tab"
+                aria-selected={view === v}
+                className={view === v ? 'on' : undefined}
+                onClick={() => {
+                  setView(v)
+                  setActiveSec(v === 'monitoring' ? SECTIONS[0].id : PAY_SECTIONS[0].id)
+                  window.scrollTo(0, 0)
+                }}
+              >
+                {v === 'monitoring' ? 'Monitoring' : 'Caterer payments'}
+              </button>
+            ))}
+          </div>
           <FilterBar
             filters={filters}
             onChange={setFilters}
@@ -87,7 +114,7 @@ export function App() {
 
       <div className="shell">
         <nav className="rail" aria-label="Sections">
-          {SECTIONS.map((s) => (
+          {railItems.map((s) => (
             <button key={s.id} className={activeSec === s.id ? 'on' : undefined} onClick={() => goTo(s.id)}>
               <span className="rn">{s.num}</span>
               {s.name}
@@ -96,24 +123,30 @@ export function App() {
         </nav>
 
         <main className="content">
-          <Section
-            id="scorecard"
-            num="01"
-            title="Scorecard"
-            note={`${slice.subs.length} visits · ${schools} schools · term-over-term · every tile drills down`}
-          >
-            <KpiGrid slice={slice} trendSlice={sliceGeo} onDrill={setDrill} />
-          </Section>
+          {view === 'monitoring' ? (
+            <>
+              <Section
+                id="scorecard"
+                num="01"
+                title="Scorecard"
+                note={`${slice.subs.length} visits · ${schools} schools · term-over-term · every tile drills down`}
+              >
+                <KpiGrid slice={slice} trendSlice={sliceGeo} onDrill={setDrill} />
+              </Section>
 
-          <CoverageSection slice={slice} onRegionSelect={selectRegion} />
-          <TrendSection slice={sliceGeo} />
-          <CompositionSection slice={slice} onDrill={setDrill} />
-          <ComplianceSection slice={slice} onDrill={setDrill} />
-          <NutritionSection slice={slice} onDrill={setDrill} onRegionSelect={selectRegion} />
-          <QualitySection slice={slice} onDrill={setDrill} />
-          <ChallengesSection slice={slice} onDrill={setDrill} />
-          <DataQualitySection slice={slice} />
-          <VisitsTable slice={slice} />
+              <CoverageSection slice={slice} onRegionSelect={selectRegion} />
+              <TrendSection slice={sliceGeo} />
+              <CompositionSection slice={slice} onDrill={setDrill} />
+              <ComplianceSection slice={slice} onDrill={setDrill} />
+              <NutritionSection slice={slice} onDrill={setDrill} onRegionSelect={selectRegion} />
+              <QualitySection slice={slice} onDrill={setDrill} />
+              <ChallengesSection slice={slice} onDrill={setDrill} />
+              <DataQualitySection slice={slice} />
+              <VisitsTable slice={slice} />
+            </>
+          ) : (
+            <PaymentsView sliceGeo={sliceGeo} filters={filters} />
+          )}
 
           <div className="colophon">
             <span>

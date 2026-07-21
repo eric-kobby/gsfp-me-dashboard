@@ -1052,6 +1052,195 @@ table,
   flex-wrap: wrap;
 }
 
+/* ---------------- view switch ---------------- */
+.viewswitch {
+  display: flex;
+  border: 1px solid var(--field-border);
+  border-radius: 3px;
+  overflow: hidden;
+  flex: none;
+}
+.viewswitch button {
+  border: none;
+  background: var(--panel);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+}
+.viewswitch button + button {
+  border-left: 1px solid var(--field-border);
+}
+.viewswitch button:hover {
+  color: var(--ink);
+}
+.viewswitch button.on {
+  background: var(--brand);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+/* ---------------- payments ---------------- */
+.pay-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+}
+.pay-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pay-field label {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.pay-field select,
+.pay-field input {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--field-border);
+  border-radius: 3px;
+  padding: 6px 10px;
+  min-width: 150px;
+}
+.pay-field input {
+  font-feature-settings: 'tnum';
+  font-weight: 700;
+  max-width: 120px;
+  min-width: 90px;
+}
+.pay-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding-bottom: 7px;
+  cursor: pointer;
+}
+.pay-scope {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding-bottom: 7px;
+}
+.pay-scope strong {
+  color: var(--ink);
+}
+.rate-warn {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--amber);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.rate-warn strong {
+  color: var(--ink);
+}
+
+.pay-totals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0 26px;
+  margin-top: 16px;
+  border-top: 1px solid var(--rule-2);
+}
+@media (max-width: 900px) {
+  .pay-totals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.pt {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule-2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.pt-k {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.pt-v {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.1;
+}
+.pt.grand .pt-v {
+  color: var(--brand);
+  font-size: 26px;
+}
+.pt.grand .pt-k {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.trow.total {
+  border-top: 2px solid var(--ink);
+  border-bottom: none;
+  font-weight: 700;
+  background: var(--panel);
+}
+.sub-cell {
+  color: var(--ink-2);
+  font-weight: 400;
+  font-size: 11px;
+  display: block;
+}
+.amt {
+  font-weight: 700;
+}
+.cap-flag {
+  color: var(--amber);
+  font-weight: 700;
+}
+.verif {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* ---------------- print ---------------- */
+@media print {
+  .masthead,
+  .rail,
+  .viewswitch,
+  .ghost-btn,
+  .pay-controls,
+  .colophon,
+  .drawer,
+  .scrim {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .sec {
+    padding: 12px 0;
+    break-inside: avoid;
+  }
+  .trow {
+    break-inside: avoid;
+  }
+  .tbl-scroll-y {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

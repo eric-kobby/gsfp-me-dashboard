@@ -51,6 +51,39 @@ npm run preview      # serve the production build
 > break on the `&`. Keep it that way, or rename the parent folder to drop the `&`
 > and you can restore the plain `vite` / `tsc -b` scripts.
 
+## Caterer payments (accounts report)
+
+The masthead switches between **Monitoring** and **Caterer payments**. The payment
+view turns monitoring submissions into a payable schedule:
+
+```
+Payable = pupils fed × cooking days (NCD) × rate per child per day
+```
+
+- **P1 Basis of payment** — payment period, editable rate, optional "cap enrolment
+  at the head teacher's figure", and control totals (caterers / pupils / days / total).
+- **P2 Disbursement summary** — roll-up by region or district for payment batches.
+- **P3 Payment schedule** — one row per caterer with school, EMIS, phone, pupils,
+  days, rate, amount and the verifying visit; **Export CSV** for accounts.
+
+**Selection rule.** A monitoring visit reports the current term's cooking days
+*as at the visit date*, and any earlier term in full (form Q15.5–15.7). So for
+term T the engine considers every visit from term T onwards that carries a figure
+for T and takes the **latest** — the most complete verified figure available.
+Rows verified before the term closed are marked `■ PART` (days may be understated);
+caterers with no health certificate sighted are marked `■ CERT` (flagged, not withheld).
+
+> The rate ships as a **placeholder** and is stored in `localStorage`. Set the
+> GSFP-approved rate before the schedule is used for disbursement.
+
+Verify the arithmetic any time — this bundles the real `src/lib/payments.ts` and
+cross-foots it against the data (unique rows, row arithmetic, schedule vs region
+vs district roll-ups, CSV integrity):
+
+```bash
+npm run verify:payments        # optionally: npm run verify:payments -- 2.00
+```
+
 ## Demo data (all 16 regions)
 
 The app currently ships a **synthetic national dataset** — ~1,780 monitoring

@@ -124,6 +124,7 @@ for (const { district, region } of geo.districts) {
     const kitchen = weighted(KITCHEN)
     const onPrem = yn(0.86)
     const catNames = Array.from({ length: nCat }, () => name())
+    const catPhones = Array.from({ length: nCat }, () => phone())
 
     // which terms was this school visited? most schools 2-3 times.
     const visitTerms = TERMS.filter(() => chance(0.72))
@@ -172,6 +173,7 @@ for (const { district, region } of geo.districts) {
         Region: region,
         district,
         school_name: school,
+        emis_code: emis,
         lat: String(lat),
         lon: String(lon),
         No_boys: String(boys),
@@ -218,8 +220,19 @@ for (const { district, region } of geo.districts) {
       }
       submissions.push(sub)
 
+      // NCDs (cooking days). A visit reports the current term as-at the visit date,
+      // and any earlier terms in full — mirroring Q15.5–15.7 of the form.
+      const termIdx = TERMS.findIndex((t) => t.term === w.term)
+      const progress = Math.max(0.08, Math.min(1, (date - w.from) / (w.to - w.from)))
+      const FULL_TERM = 65 // ~13 school weeks × 5 days
+      const ncdFor = (i) => {
+        if (i > termIdx) return '' // term hasn't happened yet
+        if (i < termIdx) return String(rint(56, FULL_TERM)) // completed term
+        return String(Math.max(3, Math.round(FULL_TERM * progress * (0.9 + rnd() * 0.12))))
+      }
+      const ncd = [ncdFor(0), ncdFor(1), ncdFor(2)]
+
       // caterer rows — certification is the deliberately weak national indicator
-      const ncdTerms = { '1st Term': 1, '2nd Term': 2, '3rd Term': 3 }[w.term]
       for (let c = 0; c < nCat; c++) {
         const screened = yn(0.55 + q * 0.35)
         const obtained = screened === 'yes' ? yn(0.55 + q * 0.3) : 'no'
@@ -231,20 +244,23 @@ for (const { district, region } of geo.districts) {
         caterers.push({
           _id: sub._id,
           term: w.term,
+          record_date: dstr,
           Region: region,
           district,
           school_name: school,
           caterer_name: catNames[c],
+          phone: catPhones[c],
           enrollment: String(enrols[c]),
           health_screened: screened,
           cert_obtained: obtained,
           cert_inspected: obtained === 'yes' ? (chance(0.75) ? 'seen' : 'not_available') : '',
           total_cooks: String(totalCooks),
           cooks_with_valid_cert: String(Math.min(totalCooks, certCooks)),
+          ncd_1st_term: ncd[0],
+          ncd_2nd_term: ncd[1],
+          ncd_3rd_term: ncd[2],
         })
       }
-      // keep the ncdTerms reference meaningful without adding unused vars
-      void ncdTerms
     }
   }
 }
