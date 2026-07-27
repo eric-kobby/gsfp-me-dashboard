@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Filters, Slice } from './data/types'
 import { SUBMISSIONS, CATERERS, LATEST_VISIT_DATE } from './data/dataset'
 import { distinctSchools, type Indicator } from './lib/metrics'
@@ -7,6 +7,7 @@ import { KpiGrid } from './components/KpiGrid'
 import { DrillDrawer } from './components/DrillDrawer'
 import { Section, SECTIONS } from './components/Section'
 import { PaymentsView } from './components/PaymentsView'
+import { MethodologyView, MET_SECTIONS } from './components/MethodologyView'
 import { CoverageSection } from './components/sections/CoverageSection'
 import { TrendSection } from './components/sections/TrendSection'
 import { CompositionSection } from './components/sections/CompositionSection'
@@ -18,12 +19,24 @@ import { DataQualitySection } from './components/sections/DataQualitySection'
 import { VisitsTable } from './components/sections/VisitsTable'
 
 type Theme = 'light' | 'dark'
-type View = 'monitoring' | 'payments'
+type View = 'monitoring' | 'payments' | 'methodology'
 
 const PAY_SECTIONS = [
   { id: 'pay-basis', num: 'P1', name: 'Basis of payment' },
   { id: 'pay-summary', num: 'P2', name: 'Disbursement' },
   { id: 'pay-schedule', num: 'P3', name: 'Schedule' },
+]
+
+const RAILS: Record<View, { id: string; num: string; name: string }[]> = {
+  monitoring: SECTIONS,
+  payments: PAY_SECTIONS,
+  methodology: MET_SECTIONS,
+}
+
+const VIEW_TABS: { id: View; label: string }[] = [
+  { id: 'monitoring', label: 'Monitoring' },
+  { id: 'payments', label: 'Caterer payments' },
+  { id: 'methodology', label: 'Methodology' },
 ]
 
 export function App() {
@@ -32,12 +45,34 @@ export function App() {
   const [drill, setDrill] = useState<Indicator | null>(null)
   const [view, setView] = useState<View>('monitoring')
   const [activeSec, setActiveSec] = useState<string>(SECTIONS[0].id)
-  const railItems = view === 'monitoring' ? SECTIONS : PAY_SECTIONS
+  const [mastH, setMastH] = useState(96)
+  const mastRef = useRef<HTMLElement>(null)
+  const railItems = RAILS[view]
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('gsfp-theme', theme)
   }, [theme])
+
+  // Track the sticky masthead's height so the rail tucks right under it,
+  // however tall it grows (wrapped filters, the third tab).
+  useEffect(() => {
+    const el = mastRef.current
+    if (!el) return
+    const apply = () => {
+      const h = el.offsetHeight
+      setMastH(h)
+      document.documentElement.style.setProperty('--mast-h', `${h}px`)
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(el)
+    window.addEventListener('resize', apply)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', apply)
+    }
+  }, [])
 
   // Scroll-spy for the section index rail.
   useEffect(() => {
@@ -48,14 +83,14 @@ export function App() {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
         if (visible[0]) setActiveSec(visible[0].target.id)
       },
-      { rootMargin: '-70px 0px -60% 0px', threshold: 0 },
+      { rootMargin: `-${mastH + 8}px 0px -55% 0px`, threshold: 0 },
     )
     railItems.forEach((s) => {
       const el = document.getElementById(s.id)
       if (el) obs.observe(el)
     })
     return () => obs.disconnect()
-  }, [railItems])
+  }, [railItems, mastH])
 
   const slice: Slice = useMemo(() => {
     const { region, district, term } = filters
@@ -80,26 +115,26 @@ export function App() {
     <>
       <div className="kente-rule" />
 
-      <header className="masthead">
+      <header className="masthead" ref={mastRef}>
         <div className="masthead-bar">
           <div className="lockup">
             <span className="mark">Ghana School Feeding Programme</span>
             <span className="sub">Zonal M&amp;E Ledger</span>
           </div>
           <div className="viewswitch" role="tablist" aria-label="View">
-            {(['monitoring', 'payments'] as View[]).map((v) => (
+            {VIEW_TABS.map((t) => (
               <button
-                key={v}
+                key={t.id}
                 role="tab"
-                aria-selected={view === v}
-                className={view === v ? 'on' : undefined}
+                aria-selected={view === t.id}
+                className={view === t.id ? 'on' : undefined}
                 onClick={() => {
-                  setView(v)
-                  setActiveSec(v === 'monitoring' ? SECTIONS[0].id : PAY_SECTIONS[0].id)
+                  setView(t.id)
+                  setActiveSec(RAILS[t.id][0].id)
                   window.scrollTo(0, 0)
                 }}
               >
-                {v === 'monitoring' ? 'Monitoring' : 'Caterer payments'}
+                {t.label}
               </button>
             ))}
           </div>
@@ -144,8 +179,10 @@ export function App() {
               <DataQualitySection slice={slice} />
               <VisitsTable slice={slice} />
             </>
-          ) : (
+          ) : view === 'payments' ? (
             <PaymentsView sliceGeo={sliceGeo} filters={filters} onFilterChange={setFilters} />
+          ) : (
+            <MethodologyView />
           )}
 
           <div className="colophon">

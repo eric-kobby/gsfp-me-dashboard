@@ -45,9 +45,13 @@
 
   --serif: 'Source Serif 4', Georgia, serif;
   --sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
 
   --rail-w: 174px;
   --pad-x: 26px;
+  /* height of the sticky masthead, measured at runtime so the rail tucks
+     right under it however tall it gets (wrapped filters, extra tabs). */
+  --mast-h: 96px;
 }
 
 :root[data-theme='dark'] {
@@ -180,9 +184,9 @@ table,
   border-right: 1px solid var(--rule);
   padding: 18px 0;
   position: sticky;
-  top: 57px;
+  top: var(--mast-h);
   align-self: flex-start;
-  max-height: calc(100vh - 57px);
+  max-height: calc(100vh - var(--mast-h));
   overflow-y: auto;
 }
 .rail button {
@@ -310,7 +314,7 @@ table,
 /* ---------------- sections ---------------- */
 .sec {
   padding: 22px var(--pad-x) 8px;
-  scroll-margin-top: 66px;
+  scroll-margin-top: calc(var(--mast-h) + 10px);
 }
 .sec:last-of-type {
   padding-bottom: 30px;
@@ -1262,6 +1266,160 @@ table,
   font-size: 11.5px;
   color: var(--ink-2);
   white-space: nowrap;
+}
+
+/* ---------------- methodology ---------------- */
+.mth {
+  max-width: 860px;
+}
+.mth p {
+  max-width: 68ch;
+  font-size: 14px;
+  color: var(--ink);
+}
+.mth .lead {
+  color: var(--ink-2);
+}
+.mth h4 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 15px;
+  margin: 20px 0 4px;
+}
+.mth .rules {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.mth .rules li {
+  position: relative;
+  padding: 8px 0 8px 24px;
+  border-bottom: 1px solid var(--rule-2);
+  max-width: 74ch;
+  font-size: 14px;
+}
+.mth .rules li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 15px;
+  width: 7px;
+  height: 7px;
+  background: var(--kente-gold);
+}
+.mth .formula {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  background: var(--surface-2, var(--panel));
+  border: 1px solid var(--rule-2);
+  border-left: 3px solid var(--brand);
+  border-radius: 3px;
+  padding: 12px 15px;
+  margin: 12px 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--ink);
+}
+.mth .formula b {
+  color: var(--brand);
+  font-weight: 700;
+}
+.mth .formula .op {
+  color: var(--ink-2);
+}
+.mth .eg {
+  background: var(--panel);
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  padding: 13px 16px 11px;
+  margin: 14px 0;
+}
+.mth .eg .tag {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--kente-gold);
+  display: block;
+  margin-bottom: 6px;
+}
+.mth .eg p {
+  margin: 0 0 8px;
+}
+.mth .eg .calc {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.mth .eg .res {
+  font-weight: 700;
+  color: var(--brand);
+}
+.mth .eg .fine {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 8px 0 0;
+}
+.mth-table {
+  overflow-x: auto;
+  margin: 14px 0;
+}
+.mth-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  min-width: 560px;
+}
+.mth-table th,
+.mth-table td {
+  text-align: left;
+  padding: 8px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule-2);
+}
+.mth-table th {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  font-weight: 700;
+  border-bottom: 1px solid var(--ink);
+}
+.mth-table td b {
+  font-weight: 700;
+}
+.mth-table .ic {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  display: block;
+}
+.mth-table .calc {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.mth .chips {
+  display: inline-flex;
+  gap: 6px;
+  vertical-align: middle;
+}
+.mth .chip {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+}
+.mth .chip.g {
+  color: var(--good);
+}
+.mth .chip.a {
+  color: var(--amber);
+}
+.mth .chip.c {
+  color: var(--crit);
 }
 
 /* ---------------- print ---------------- */
