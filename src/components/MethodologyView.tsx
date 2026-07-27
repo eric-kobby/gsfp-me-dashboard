@@ -250,8 +250,7 @@ export function MethodologyView() {
           <span className="h">What “Attend because of the meals” means</span>
           The share of monitored schools where a pupil reports that the feeding programme is a reason
           they come to school — a direct read on the meal as an <b>attendance and enrolment
-          incentive</b>, a core outcome the programme is funded to deliver. It is not a compliance
-          measure; it measures effect on the child.
+          incentive</b>. It is not a compliance measure; it measures effect on the child.
           <br />
           <br />
           <b>Other meals per day</b> is an average, not a percentage — the mean number of additional
