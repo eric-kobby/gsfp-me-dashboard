@@ -939,6 +939,13 @@ table,
 .callout strong {
   color: var(--brand);
 }
+.callout .h {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
 
 /* donut — drawer only */
 .donut-wrap {
